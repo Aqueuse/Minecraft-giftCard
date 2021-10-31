@@ -1,0 +1,8 @@
+name: NeverEnoughGiftCards
+version: 0.1
+author: Aqueuse
+main: fr.neverenough.giftcard.Main
+api-version: 1.17
+commands:
+  giftcard:
+    description: send a giftcard.
