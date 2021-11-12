@@ -1,13 +1,15 @@
 package fr.neverenough.giftcard;
 
-import fr.neverenough.giftcard.listeners.OnDrawMap;
+import java.util.Objects;
+
 import fr.neverenough.giftcard.map.MapRender;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.MapMeta;
+import org.bukkit.map.MapView;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.Objects;
 
 public class Main extends JavaPlugin {
 	public static MapRender myMapRender;
@@ -15,8 +17,6 @@ public class Main extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		myMapRender = new MapRender("");
-
-		getServer().getPluginManager().registerEvents(new OnDrawMap(), this);
 
 		Objects.requireNonNull(getCommand("giftcard")).setExecutor((commandSender, command, label, args) -> {
 			StringBuilder message = new StringBuilder();
@@ -40,10 +40,19 @@ public class Main extends JavaPlugin {
 					multilineMessage = multilineMessage + message.substring(i*charactersByLine, (i*charactersByLine)+charactersByLine) + "\n";
 				}
 
+				ItemStack giftcardsStack = new ItemStack( Material.FILLED_MAP, 1);
 				myMapRender = new MapRender(multilineMessage);
 
-				ItemStack itemStack = new ItemStack(Material.MAP, 1);
-				player.getInventory().addItem(itemStack);
+				MapMeta meta = (MapMeta) giftcardsStack.getItemMeta();
+
+				MapView mapView = Bukkit.getServer().createMap(Bukkit.getWorld("world"));
+				mapView.getRenderers().clear();
+				mapView.addRenderer(myMapRender);
+				meta.setMapView(mapView);
+
+				giftcardsStack.setItemMeta(meta);
+
+				player.getInventory().addItem(giftcardsStack);
 			}
 			return false;
 		});
